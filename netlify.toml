@@ -1,6 +1,0 @@
-[build]
-  publish = "."
-  command = ""
-
-# Multi-page app: index.html and group.html are separate entry points.
-# Do not use a catch-all SPA redirect — it breaks group.html navigation.
