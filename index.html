@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b0b10">
+  <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Infave">
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="icon-192x192.svg">
   <title>Infave</title>
   <link rel="icon" type="image/svg+xml" href="icon-192x192.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="./styles.css?v=7">
+  <link rel="stylesheet" href="./styles.css?v=8">
 </head>
 <body>
   <div class="loading-screen hidden" id="loading-screen">
@@ -36,10 +36,12 @@
         </div>
         <button class="btn-secondary" id="sign-out-btn" type="button">Sign out</button>
       </div>
+      
       <div class="search-bar hidden" id="search-bar">
         <input type="text" id="search-input" placeholder="Search cards by name, clicks, entries, or button..." class="search-input">
         <button id="clear-search-btn" class="clear-search-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
       </div>
+      
       <div class="top-actions">
         <button id="open-create-group-modal-btn" class="primary-action" type="button">+ Create Group</button>
         <button id="open-create-card-modal-btn" class="secondary-action" type="button">+ Create Card</button>
@@ -51,7 +53,7 @@
     </header>
 
     <section class="welcome" id="welcome-screen">
-      <h2>Welcome</h2>
+      <h2>Welcome to Infave</h2>
       <p>Sign in with Google to manage groups, cards, and labeled clicks.</p>
       <div class="welcome-actions">
         <button id="welcome-sign-in-btn" type="button">
@@ -63,13 +65,59 @@
     </section>
 
     <main class="app hidden" id="app">
+      
+      <!-- ── DASHBOARD VIEW ─────────────────────────────────────────── -->
+      <div id="view-dashboard" class="view">
+        <section class="panel panel-wide">
+          <h2>Main Cards Section</h2>
+          <div id="groups-container" class="groups-container"></div>
+        </section>
+      </div>
 
-      <section class="panel panel-wide">
-        <h2>Main Cards Section.</h2>
-        <div id="groups-container" class="groups-container"></div>
-      </section>
+      <!-- ── GROUP PAGE VIEW ────────────────────────────────────────── -->
+      <div id="view-group" class="view hidden">
+        <section class="group-page-hero">
+          <div id="group-cover-photo" class="group-cover hidden" style="width:100%; height:150px; background-size:cover; background-position:center; border-radius:12px; margin-bottom:16px;"></div>
+          
+          <div class="group-info-section" style="margin-bottom: 24px;">
+            <span><strong>Created:</strong> <span id="group-created">-</span></span>
+            <span><strong>Cards:</strong> <span id="group-stat-cards">0</span></span>
+            <span><strong>Entries:</strong> <span id="group-stat-entries">0</span></span>
+            <span><strong>Total:</strong> <span id="group-stat-total">0</span></span>
+            <span><strong>Week:</strong> <span id="group-stat-week">0</span></span>
+            <span><strong>Month:</strong> <span id="group-stat-month">0</span></span>
+          </div>
+
+          <h1 id="group-title" class="group-page-title">Group</h1>
+          <p id="group-description" class="group-page-desc"></p>
+          
+          <div class="group-controls">
+            <button id="back-to-dashboard-btn" class="inline-btn btn-secondary" type="button">
+              <i class="fa-solid fa-arrow-left"></i> Back to Groups
+            </button>
+            <button id="edit-group-btn" class="inline-btn btn-secondary" type="button">
+              <i class="fa-solid fa-pen"></i> Edit Group
+            </button>
+            <select id="group-layout-select" class="inline-btn">
+              <option value="3">3 cards/row</option>
+              <option value="4">4 cards/row</option>
+            </select>
+            <select id="group-sort-select" class="inline-btn">
+              <option value="newest">Newest</option>
+              <option value="most">Most clicked</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel panel-wide" style="padding-top: 0;">
+          <div id="cards-container" class="cards-grid layout-3"></div>
+        </section>
+      </div>
+
     </main>
   </div>
+
+  <!-- ── MODALS ─────────────────────────────────────────────────────── -->
 
   <div class="modal hidden" id="entry-modal">
     <div class="modal-content">
@@ -112,7 +160,6 @@
     </div>
   </div>
 
-  <!-- Edit group modal -->
   <div class="modal hidden" id="edit-group-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -130,7 +177,7 @@
       <div class="form-group">
         <label for="edit-group-cover-input">Cover Photo</label>
         <input id="edit-group-cover-input" type="file" accept="image/*">
-        <div id="edit-group-cover-preview" class="image-preview" style="width:100%; height:120px; background:#1f2937; border-radius:8px; margin-top:8px; display:flex; align-items:center; justify-content:center; color:var(--muted-foreground);"></div>
+        <div id="edit-group-cover-preview" class="image-preview" style="width:100%; height:120px; background:var(--muted); border-radius:12px; margin-top:8px; display:flex; align-items:center; justify-content:center; color:var(--muted-foreground);"></div>
       </div>
       <div class="form-group">
         <label for="edit-group-click-limit-input">Click Limit (optional)</label>
@@ -146,12 +193,11 @@
         <h3>Create Card</h3>
         <button id="close-create-card-modal-btn" class="danger-btn" type="button">Close</button>
       </div>
-      <!-- Top row: Card Image | Group | Card Type -->
       <div style="display:flex; gap:12px; align-items:flex-start;">
         <div class="form-group" style="flex:1;">
           <label for="card-image-input">Card Image</label>
           <input id="card-image-input" type="file" accept="image/*">
-          <div id="card-image-preview" style="margin-top:8px; max-width:200px; max-height:150px; overflow:hidden; border-radius:8px;"></div>
+          <div id="card-image-preview" style="margin-top:8px; max-width:200px; max-height:150px; overflow:hidden; border-radius:12px;"></div>
         </div>
         <div class="form-group" style="flex:1;">
           <label for="card-group-select">Group (optional)</label>
@@ -188,10 +234,9 @@
     </div>
   </div>
 
-  <!-- Add Button Sub-Modal (Create Card) -->
-  <div class="modal hidden" id="add-button-modal" style="background:rgba(0,0,0,0.5);">
+  <div class="modal hidden" id="add-button-modal" style="background:rgba(0,0,0,0.4);">
     <div class="modal-content" style="max-width:350px;">
-      <div class="modal-header" style="justify-content:center;">
+      <div class="modal-header" style="justify-content:center; border-bottom: none; margin-bottom: 16px;">
         <h3>Add Button</h3>
       </div>
       <div class="form-group">
@@ -213,7 +258,7 @@
       <div class="form-group" id="button-image-group" style="display:none;">
         <label for="button-image-input">Upload Image</label>
         <input id="button-image-input" type="file" accept="image/*">
-        <div id="button-image-preview" style="margin-top:8px; max-width:150px; max-height:100px; overflow:hidden; border-radius:8px; display:none;"></div>
+        <div id="button-image-preview" style="margin-top:8px; max-width:150px; max-height:100px; overflow:hidden; border-radius:12px; display:none;"></div>
       </div>
       <button id="add-button-btn" type="button">Add Button</button>
     </div>
@@ -227,7 +272,7 @@
       </div>
       <div class="card-info-section">
         <h4>Card Info</h4>
-        <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.85rem;">
+        <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.85rem; font-weight: 600;">
           <span id="edit-card-clicks-row"><strong>Total:</strong> <span id="edit-card-total-clicks">0</span></span>
           <span id="edit-card-week-row"><strong>Week:</strong> <span id="edit-card-week-clicks">0</span></span>
           <span id="edit-card-month-row"><strong>Month:</strong> <span id="edit-card-month-clicks">0</span></span>
@@ -236,12 +281,11 @@
         </div>
         <div id="edit-card-button-stats" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"></div>
       </div>
-      <!-- Top row: Card Image | Group | Card Type -->
       <div style="display:flex; gap:12px; align-items:flex-start;">
         <div class="form-group" style="flex:1;">
           <label for="edit-card-image-input">Card Image</label>
           <input id="edit-card-image-input" type="file" accept="image/*">
-          <div id="edit-card-image-preview" style="margin-top:8px; max-width:200px; max-height:150px; overflow:hidden; border-radius:8px;"></div>
+          <div id="edit-card-image-preview" style="margin-top:8px; max-width:200px; max-height:150px; overflow:hidden; border-radius:12px;"></div>
         </div>
         <div class="form-group" style="flex:1;">
           <label for="edit-card-group-select">Group (optional)</label>
@@ -278,10 +322,9 @@
     </div>
   </div>
 
-  <!-- Add Button Sub-Modal (Edit Card) -->
-  <div class="modal hidden" id="add-edit-button-modal" style="background:rgba(0,0,0,0.5);">
+  <div class="modal hidden" id="add-edit-button-modal" style="background:rgba(0,0,0,0.4);">
     <div class="modal-content" style="max-width:350px;">
-      <div class="modal-header" style="justify-content:center;">
+      <div class="modal-header" style="justify-content:center; border-bottom: none; margin-bottom: 16px;">
         <h3>Add Button</h3>
       </div>
       <div class="form-group">
@@ -303,24 +346,23 @@
       <div class="form-group" id="edit-button-image-group" style="display:none;">
         <label for="edit-button-image-input">Upload Image</label>
         <input id="edit-button-image-input" type="file" accept="image/*">
-        <div id="edit-button-image-preview" style="margin-top:8px; max-width:150px; max-height:100px; overflow:hidden; border-radius:8px; display:none;"></div>
+        <div id="edit-button-image-preview" style="margin-top:8px; max-width:150px; max-height:100px; overflow:hidden; border-radius:12px; display:none;"></div>
       </div>
       <button id="add-edit-button-btn" type="button">Add Button</button>
     </div>
   </div>
 
-  <div class="modal hidden" id="card-context-menu" style="background:rgba(0,0,0,0.5);">
-    <div class="modal-content" style="max-width:200px; text-align:center;">
-      <h4 style="margin:0 0 12px 0;">Card Options</h4>
+  <div class="modal hidden" id="card-context-menu" style="background:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="max-width:220px; text-align:center;">
+      <h4 style="margin:0 0 16px 0; font-size: 1.1rem; font-weight: 800;">Card Options</h4>
       <button id="context-edit-card" class="inline-btn btn-secondary" type="button" style="display:block; width:100%; margin-bottom:8px;">Edit Card</button>
       <button id="context-delete-card" class="inline-btn danger-btn" type="button" style="display:block; width:100%;">Delete Card</button>
     </div>
   </div>
 
-  <!-- Group context menu -->
-  <div class="modal hidden" id="group-context-menu" style="background:rgba(0,0,0,0.5);">
-    <div class="modal-content" style="max-width:200px; text-align:center;">
-      <h4 style="margin:0 0 12px 0;">Group Options</h4>
+  <div class="modal hidden" id="group-context-menu" style="background:rgba(0,0,0,0.4);">
+    <div class="modal-content" style="max-width:220px; text-align:center;">
+      <h4 style="margin:0 0 16px 0; font-size: 1.1rem; font-weight: 800;">Group Options</h4>
       <button id="context-edit-group" class="inline-btn btn-secondary" type="button" style="display:block; width:100%; margin-bottom:8px;">Edit Group</button>
       <button id="context-delete-group" class="inline-btn danger-btn" type="button" style="display:block; width:100%;">Delete Group</button>
     </div>
@@ -332,13 +374,19 @@
         <h3 id="description-modal-title">Edit Entry</h3>
         <button id="close-description-modal-btn" class="danger-btn" type="button">Close</button>
       </div>
-      <label style="display:block; margin-bottom:4px; font-weight:600;">Entry Name</label>
-      <input type="text" id="edit-entry-label-input" placeholder="Entry name..." style="width:100%; margin-bottom:12px;">
-      <label style="display:block; margin-bottom:4px; font-weight:600;">Position Number</label>
-      <input type="number" id="edit-entry-position-input" min="1" placeholder="Position..." style="width:100%; margin-bottom:12px;">
-      <div id="entry-button-stats" class="card-info-section" style="padding:8px; margin-bottom:12px;"></div>
-      <label style="display:block; margin-bottom:4px; font-weight:600;">Description</label>
-      <textarea id="entry-description-input" placeholder="Add plain text description..."></textarea>
+      <div class="form-group">
+        <label style="display:block; margin-bottom:4px; font-weight:700;">Entry Name</label>
+        <input type="text" id="edit-entry-label-input" placeholder="Entry name..." style="width:100%;">
+      </div>
+      <div class="form-group">
+        <label style="display:block; margin-bottom:4px; font-weight:700;">Position Number</label>
+        <input type="number" id="edit-entry-position-input" min="1" placeholder="Position..." style="width:100%;">
+      </div>
+      <div id="entry-button-stats" class="card-info-section" style="padding:12px; margin-bottom:16px;"></div>
+      <div class="form-group">
+        <label style="display:block; margin-bottom:4px; font-weight:700;">Description</label>
+        <textarea id="entry-description-input" placeholder="Add plain text description..."></textarea>
+      </div>
       <button id="save-entry-description-btn" type="button">Save Changes</button>
     </div>
   </div>
@@ -349,6 +397,6 @@
     </div>
   </div>
 
-  <script type="module" src="./app.js?v=31"></script>
+  <script type="module" src="./app.js?v=8"></script>
 </body>
 </html>
