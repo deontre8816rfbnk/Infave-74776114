@@ -729,3 +729,18 @@ label {
   text-overflow: ellipsis;
   font-size: 1.1rem;
 }
+.entry-row {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  transition: background 0.15s ease;
+}
+
+.entry-row:active {
+  background: #e4e4e7;
+}
+
+.entry-copied {
+  background: #dcfce7 !important;
+}
