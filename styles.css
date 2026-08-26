@@ -604,3 +604,32 @@ label {
 .hidden {
   display: none !important;
 }
+.close-btn-sm {
+  width: auto;
+  min-width: unset;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  min-height: 36px;
+}
+
+.entry-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.entry-controls input {
+  flex: 1;
+  min-width: 120px;
+  margin: 0;
+}
+
+.entry-controls select,
+.entry-controls button {
+  width: auto;
+  min-width: unset;
+  flex-shrink: 0;
+  margin: 0;
+}
