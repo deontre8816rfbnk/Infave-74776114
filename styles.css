@@ -784,3 +784,60 @@ label {
 .group-card {
   min-height: 0;
 }
+.group-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.group-page-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.group-title-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.group-page-desc {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  margin: 0 0 8px 0;
+}
+
+.group-info-section {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.group-info-section strong {
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.group-page-hero {
+  padding: 12px 0 8px 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
