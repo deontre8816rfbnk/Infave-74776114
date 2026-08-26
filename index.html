@@ -22,22 +22,6 @@
 
   <div class="container">
   <header class="top-bar">
-      <!-- Compact Auth Section -->
-      <div class="auth-bar hidden" id="auth-bar">
-        <div class="auth-user">
-          <div class="auth-avatar" aria-hidden="true">
-            <img id="auth-photo" alt="" class="hidden">
-            <span id="auth-avatar-fallback"><i class="fa-solid fa-user"></i></span>
-          </div>
-          <div class="auth-meta">
-            <div class="auth-name" id="auth-name">Signed in</div>
-          </div>
-        </div>
-        <button class="icon-btn" id="sign-out-btn" type="button" title="Sign out">
-          <i class="fa-solid fa-right-from-bracket"></i>
-        </button>
-      </div>
-
       <!-- Mobile Search & Action Row -->
       <div class="search-row hidden" id="search-bar">
         <div class="search-bar">
@@ -47,6 +31,9 @@
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
+        <button id="sign-out-btn" class="icon-btn" type="button" title="Sign out">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
         <button id="open-create-group-modal-btn" class="icon-btn primary-icon-btn" type="button" title="Create Group">
           <i class="fa-solid fa-folder-plus"></i>
         </button>
@@ -54,7 +41,7 @@
           <i class="fa-solid fa-plus"></i>
         </button>
       </div>
-
+    
       <button id="sign-in-btn" class="btn-primary full-width" type="button">
         <i class="fa-brands fa-google"></i> Continue with Google
       </button>
