@@ -909,19 +909,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const card = state.cards.find((c) => c.id === cardId); if (!card) return;
     if (sourceType === "card") card.clicks += 1;
     card.updatedAt = nowIso(); card.clickHistory.unshift({ at: nowIso(), sourceType, sourceName });
-    await saveStateToFirestore(); renderCurrentView();
+    renderCurrentView();
     if (activeCardIdForEntries === cardId) renderEntryList();
+    await saveStateToFirestore();
   }
 
   function handleAdditionalButtonClick(cardId, buttonId) {
     const card = state.cards.find((c) => c.id === cardId); if (!card) return;
     const button = card.buttons.find((b) => b.id === buttonId); if (!button) return;
     button.clickCount += 1; card.updatedAt = nowIso();
-    registerClick(cardId, "button", button.name);
+    card.clickHistory.unshift({ at: nowIso(), sourceType: "button", sourceName: button.name });
+    renderCurrentView();
+    saveStateToFirestore();
     if (button.type === "link" && button.value) window.open(button.value, "_blank", "noopener,noreferrer");
     if (button.type === "image" && button.value) { fullscreenImage.src = button.value; imageModal.classList.remove("hidden"); }
-  }
-
+}
   // ── Entries Logic ────────────────────────────────────────────────────────
   function openEntryModal(cardId) { activeCardIdForEntries = cardId; const card = state.cards.find((c) => c.id === cardId); if (!card) return; entryModalTitle.textContent = card.title; entrySearchInput.value = ""; entryNewLabelInput.value = ""; entryModal.classList.remove("hidden"); renderEntryList(); }
   function closeEntryModal() { autoSaveEntryOnBlur(); entryModal.classList.add("hidden"); activeCardIdForEntries = null; entryList.innerHTML = ""; }
