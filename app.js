@@ -273,7 +273,6 @@ document.addEventListener("DOMContentLoaded", () => {
     appEl.classList.add("hidden");
     authBar.classList.add("hidden");
     authName.textContent = "Signed out";
-    authEmail.textContent = "";
     authPhoto.classList.add("hidden");
     authAvatarFallback.classList.remove("hidden");
     signInBtn.classList.remove("hidden");
@@ -292,7 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
     searchBar.classList.remove("hidden");
 
     authName.textContent = user.displayName || "Signed in";
-    authEmail.textContent = user.email || "";
 
     if (user.photoURL) {
       authPhoto.src = user.photoURL;
