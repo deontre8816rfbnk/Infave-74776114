@@ -698,10 +698,11 @@ label {
 /* Same size for entry modal + edit entry modal */
 #entry-modal .modal-content,
 #description-modal .modal-content {
-  width: 75vw;
-  max-width: 75vw;
-  height: 75vh;
-  max-height: 75vh;
+  width: 96vw;
+  max-width: 96vw;
+  height: 85vh;
+  max-height: 85vh;
+  border-radius: 16px;
 }
 
 /* Smooth fast click feedback */
