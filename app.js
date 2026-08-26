@@ -969,7 +969,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const row = document.createElement("div");
       row.className = "entry-row";
       row.dataset.entryId = entry.id;
-      row.innerHTML = `<div class="entry-row-header"><strong>${displayNum}. \( {escapeHtml(entry.label)}</strong><span class="muted"> \){new Date(entry.createdAt).toLocaleString()}</span></div>`;
+      row.innerHTML = `<div class="entry-row-header"><strong>${displayNum}. ${escapeHtml(entry.label)}</strong><span class="muted"> ${new Date(entry.createdAt).toLocaleString()}</span></div>`;
 
       let longPressTimer = null;
       let longPressed = false;
