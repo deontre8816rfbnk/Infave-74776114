@@ -646,3 +646,52 @@ label {
   font-weight: 500;
   min-height: 36px;
 }
+/* Entry modal bigger (\~75%) */
+#entry-modal .modal-content {
+  width: 75vw;
+  max-width: 75vw;
+  height: 75vh;
+  max-height: 75vh;
+}
+
+/* Search / new-label inputs expand on focus */
+#entry-search-input:focus,
+#entry-new-label-input:focus {
+  min-width: 100%;
+  width: 100%;
+  flex: 1 1 100%;
+}
+
+.entry-controls:focus-within {
+  flex-wrap: wrap;
+}
+
+/* Space between entries */
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.entry-row {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.entry-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.entry-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
