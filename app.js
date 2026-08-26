@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const appEl = document.getElementById("app");
   const authBar = document.getElementById("auth-bar");
   const authName = document.getElementById("auth-name");
-  const authEmail = document.getElementById("auth-email");
   const authPhoto = document.getElementById("auth-photo");
   const authAvatarFallback = document.getElementById("auth-avatar-fallback");
   const syncHint = document.getElementById("sync-hint");
