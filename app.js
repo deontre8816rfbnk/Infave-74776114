@@ -275,17 +275,6 @@ document.addEventListener("DOMContentLoaded", () => {
     signInBtn.classList.add("hidden");
     if (searchBar) searchBar.classList.remove("hidden");
   }
-    authName.textContent = user.displayName || "Signed in";
-
-    if (user.photoURL) {
-      authPhoto.src = user.photoURL;
-      authPhoto.classList.remove("hidden");
-      authAvatarFallback.classList.add("hidden");
-    } else {
-      authPhoto.classList.add("hidden");
-      authAvatarFallback.classList.remove("hidden");
-    }
-  }
 
   // ── View Switching (SPA Logic) ───────────────────────────────────────────
   function showDashboardView() {
