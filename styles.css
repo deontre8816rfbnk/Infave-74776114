@@ -32,7 +32,7 @@ body {
   color: var(--foreground);
   line-height: 1.5;
   min-height: 100vh;
-  font-weight: 600;
+  font-weight: 400;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
@@ -345,12 +345,17 @@ body {
   color: var(--foreground);
 }
 
+.muted {
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
 .group-card .card-top .muted {
   color: var(--muted-foreground);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 400;
 }
-
 /* ── Cards Grid (Inside Groups) ──────────────────────────────────────── */
 
 .cards-grid {
