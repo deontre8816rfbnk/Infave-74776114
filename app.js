@@ -948,7 +948,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ── Entries Logic ────────────────────────────────────────────────────────
-  function openEntryModal(cardId) { activeCardIdForEntries = cardId; const card = state.cards.find((c) => c.id === cardId); if (!card) return; entryModalTitle.textContent = `Entries: ${card.title}`; entrySearchInput.value = ""; entryNewLabelInput.value = ""; entryModal.classList.remove("hidden"); renderEntryList(); }
+  function openEntryModal(cardId) { activeCardIdForEntries = cardId; const card = state.cards.find((c) => c.id === cardId); if (!card) return; entryModalTitle.textContent = card.title; entrySearchInput.value = ""; entryNewLabelInput.value = ""; entryModal.classList.remove("hidden"); renderEntryList(); }
   function closeEntryModal() { autoSaveEntryOnBlur(); entryModal.classList.add("hidden"); activeCardIdForEntries = null; entryList.innerHTML = ""; }
   async function autoSaveEntryOnBlur() {
     if (!activeCardIdForEntries) return; const label = entryNewLabelInput.value.trim(); if (!label) return;
