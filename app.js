@@ -255,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function setLoadingUI() {
     welcomeScreen.classList.add("hidden");
     appEl.classList.add("hidden");
-    signInBtn.classList.add("hidden");
+    if (signInBtn) signInBtn.classList.add("hidden");
     if (searchBar) searchBar.classList.add("hidden");
     if (loadingScreen) loadingScreen.classList.remove("hidden");
   }
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loadingScreen) loadingScreen.classList.add("hidden");
     welcomeScreen.classList.remove("hidden");
     appEl.classList.add("hidden");
-    signInBtn.classList.remove("hidden");
+    if (signInBtn) signInBtn.classList.remove("hidden");
     if (searchBar) searchBar.classList.add("hidden");
   }
 
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loadingScreen) loadingScreen.classList.add("hidden");
     welcomeScreen.classList.add("hidden");
     appEl.classList.remove("hidden");
-    signInBtn.classList.add("hidden");
+    if (signInBtn) signInBtn.classList.add("hidden");
     if (searchBar) searchBar.classList.remove("hidden");
   }
 
@@ -939,27 +939,89 @@ document.addEventListener("DOMContentLoaded", () => {
   function getSortedEntries(card) { const hasSortOrder = card.entries.some(e => e.sortOrder !== undefined); return hasSortOrder ? [...card.entries].sort((a, b) => (a.sortOrder ?? Infinity) - (b.sortOrder ?? Infinity) || new Date(a.createdAt) - new Date(b.createdAt)) : [...card.entries].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); }
   function buildEntryNumberMap(card) { const sorted = getSortedEntries(card); const map = new Map(); sorted.forEach((e, idx) => map.set(e.id, idx + 1)); return map; }
   function renderEntryList() {
-    if (!activeCardIdForEntries) return; const card = state.cards.find((c) => c.id === activeCardIdForEntries); if (!card) return;
-    const numberMap = buildEntryNumberMap(card); const q = entrySearchInput.value.trim().toLowerCase(); const sortMode = entrySortSelect.value;
-    let entries = card.entries.filter((e) => e.label.toLowerCase().includes(q));
-    if (sortMode === "oldest") entries.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    else if (sortMode === "most-clicks") entries.sort((a, b) => (b.buttons || []).reduce((sum, btn) => sum + (btn.clickCount || 0), 0) - (a.buttons || []).reduce((sum, btn) => sum + (btn.clickCount || 0), 0));
-    else if (sortMode === "number") entries.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity));
-    else entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+    if (!activeCardIdForEntries) return;
+    const card = state.cards.find((c) => c.id === activeCardIdForEntries);
+    if (!card) return;
+    let entries = [...(card.entries || [])];
+    const q = (entrySearchInput.value || "").trim().toLowerCase();
+    if (q) entries = entries.filter((e) => (e.label || "").toLowerCase().includes(q));
+    const sort = entrySortSelect.value;
+    if (sort === "newest") entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    else if (sort === "oldest") entries.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    else if (sort === "most-clicks") entries.sort((a, b) => ((b.buttons || []).reduce((s, x) => s + (x.clickCount || 0), 0)) - ((a.buttons || []).reduce((s, x) => s + (x.clickCount || 0), 0)));
+    else entries = getSortedEntries({ ...card, entries });
+    const numberMap = buildEntryNumberMap(card);
     entryList.innerHTML = "";
     if (entries.length === 0) { entryList.innerHTML = `<p class="muted">No entries found.</p>`; return; }
+
     entries.forEach((entry) => {
       const displayNum = numberMap.get(entry.id);
-      const entryButtons = (entry.buttons || []).map((b, idx) => `<button class="inline-btn chip" data-entry-btn="${entry.id}" data-btn-idx="${idx}" type="button">${escapeHtml(b.name)} ${b.clickCount || 0}</button>`).join("");
-      const row = document.createElement("div"); row.className = "entry-row";
-      row.innerHTML = `<div class="entry-row-header"><strong>${displayNum}. ${escapeHtml(entry.label)}</strong><span class="muted">${new Date(entry.createdAt).toLocaleString()}</span></div><div class="entry-row-actions">${entryButtons}<button data-copy-entry="${entry.id}" class="inline-btn" type="button">Copy</button><button data-delete-entry="${entry.id}" class="inline-btn danger-btn" type="button">Delete</button><button data-edit-entry-desc="${entry.id}" class="inline-btn btn-secondary" type="button">Edit</button></div>`;
+      const row = document.createElement("div");
+      row.className = "entry-row";
+      row.dataset.entryId = entry.id;
+      row.innerHTML = `<div class="entry-row-header"><strong>${displayNum}. \( {escapeHtml(entry.label)}</strong><span class="muted"> \){new Date(entry.createdAt).toLocaleString()}</span></div>`;
+
+      let longPressTimer = null;
+      let longPressed = false;
+      let startX = 0;
+      let currentX = 0;
+      let swiping = false;
+
+      row.addEventListener("click", () => {
+        if (longPressed || swiping) return;
+        openDescriptionModal(entry.id);
+      });
+
+      row.addEventListener("touchstart", (e) => {
+        longPressed = false;
+        swiping = false;
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        longPressTimer = setTimeout(() => {
+          longPressed = true;
+          copySingleEntry(entry.id);
+          row.classList.add("entry-copied");
+          setTimeout(() => row.classList.remove("entry-copied"), 400);
+        }, 450);
+      }, { passive: true });
+
+      row.addEventListener("touchmove", (e) => {
+        currentX = e.touches[0].clientX;
+        const dx = currentX - startX;
+        if (Math.abs(dx) > 10) {
+          clearTimeout(longPressTimer);
+          swiping = true;
+        }
+        if (dx < 0) {
+          row.style.transform = `translateX(${dx}px)`;
+          row.style.opacity = String(Math.max(0.3, 1 + dx / 200));
+        }
+      }, { passive: true });
+
+      row.addEventListener("touchend", () => {
+        clearTimeout(longPressTimer);
+        const dx = currentX - startX;
+        if (dx < -80) {
+          row.style.transition = "transform 0.2s ease, opacity 0.2s ease";
+          row.style.transform = "translateX(-120%)";
+          row.style.opacity = "0";
+          setTimeout(() => deleteEntry(entry.id), 180);
+        } else {
+          row.style.transition = "transform 0.2s ease, opacity 0.2s ease";
+          row.style.transform = "";
+          row.style.opacity = "";
+        }
+        setTimeout(() => { swiping = false; }, 50);
+      });
+
+      row.addEventListener("touchcancel", () => {
+        clearTimeout(longPressTimer);
+        row.style.transform = "";
+        row.style.opacity = "";
+      });
+
       entryList.appendChild(row);
     });
-    entryList.querySelectorAll("[data-copy-entry]").forEach((el) => el.addEventListener("click", () => copySingleEntry(el.getAttribute("data-copy-entry"))));
-    entryList.querySelectorAll("[data-delete-entry]").forEach((el) => el.addEventListener("click", () => deleteEntry(el.getAttribute("data-delete-entry"))));
-    entryList.querySelectorAll("[data-edit-entry-desc]").forEach((el) => el.addEventListener("click", () => openDescriptionModal(el.getAttribute("data-edit-entry-desc"))));
-    entryList.querySelectorAll("[data-entry-btn]").forEach((el) => el.addEventListener("click", () => { const entryId = el.getAttribute("data-entry-btn"); const btnIdx = parseInt(el.getAttribute("data-btn-idx"), 10); registerEntryButtonClick(entryId, btnIdx); }));
   }
   async function deleteEntry(entryId) { if (!activeCardIdForEntries) return; const card = state.cards.find((c) => c.id === activeCardIdForEntries); if (!card) return; card.entries = card.entries.filter((e) => e.id !== entryId); await saveStateToFirestore(); renderEntryList(); renderCurrentView(); }
   async function copySingleEntry(entryId) { const card = state.cards.find((c) => c.id === activeCardIdForEntries); if (!card) return; const entry = card.entries.find((e) => e.id === entryId); if (!entry) return; const displayNum = buildEntryNumberMap(card).get(entry.id); await navigator.clipboard.writeText(`${displayNum}. ${entry.label} - ${new Date(entry.createdAt).toLocaleString()}`); }
@@ -1003,7 +1065,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const provider = new GoogleAuthProvider();
     let authStateResolved = false; let isSigningIn = false;
 
-    function setSignInButtonsDisabled(disabled) { signInBtn.disabled = disabled; if (welcomeSignInBtn) welcomeSignInBtn.disabled = disabled; }
+    function setSignInButtonsDisabled(disabled) { if (signInBtn) signInBtn.disabled = disabled; if (welcomeSignInBtn) welcomeSignInBtn.disabled = disabled; }
     function showAuthError(err) {
       let errorMessage = "Sign-in failed. Please try again."; const errorCode = err?.code || "";
       if (errorCode === "auth/unauthorized-domain") errorMessage = "This domain is not authorized. Add it in Firebase Console.";
@@ -1029,7 +1091,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } finally { isSigningIn = false; setSignInButtonsDisabled(false); }
     };
 
-    signInBtn.addEventListener("click", handleSignIn);
+    if (signInBtn) signInBtn.addEventListener("click", handleSignIn);
     if (welcomeSignInBtn) welcomeSignInBtn.addEventListener("click", handleSignIn);
     signOutBtn.addEventListener("click", async () => { authHint.textContent = ""; setLoadingUI(); try { await signOut(auth); } catch (err) { authHint.textContent = err?.message || "Sign-out failed."; authHint.style.color = "#b91c1c"; setSignedOutUI(); } });
 
@@ -1051,7 +1113,7 @@ document.addEventListener("DOMContentLoaded", () => {
     getRedirectResult(auth).catch((err) => { if (err?.code && err.code !== "auth/cancelled-popup-request") showAuthError(err); });
   } else {
     setSignedOutUI();
-    signInBtn.addEventListener("click", () => { authHint.textContent = "Firebase isn't configured yet. Add your Firebase config first, then reload."; authHint.style.color = "#b45309"; });
+    if (signInBtn) signInBtn.addEventListener("click", () => { authHint.textContent = "Firebase isn't configured yet. Add your Firebase config first, then reload."; authHint.style.color = "#b45309"; });
   }
 
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && currentUserId) { renderCurrentView(); } });
