@@ -597,3 +597,6 @@ label {
   color: var(--muted-foreground);
   font-weight: 600;
   }
+.loading-screen.hidden {
+  display: none !important;
+}
