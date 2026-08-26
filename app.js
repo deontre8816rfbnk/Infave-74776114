@@ -721,22 +721,32 @@ document.addEventListener("DOMContentLoaded", () => {
       row.appendChild(btn);
     });
 
+    let pressStartX = 0, pressStartY = 0;
     const startLongPress = (e) => {
       if (e.target.closest("button, select, input, textarea, a")) return;
+      const point = e.touches ? e.touches[0] : e;
+      pressStartX = point.clientX;
+      pressStartY = point.clientY;
       longPressTimer = setTimeout(() => {
         activeCardIdForContext = card.id;
         cardContextMenu.classList.remove("hidden");
-      }, 500);
+      }, 550);
     };
     const cancelLongPress = () => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } };
+    const moveLongPress = (e) => {
+      const point = e.touches ? e.touches[0] : e;
+      if (Math.abs(point.clientX - pressStartX) > 10 || Math.abs(point.clientY - pressStartY) > 10) cancelLongPress();
+    };
 
     el.addEventListener("mousedown", startLongPress);
     el.addEventListener("touchstart", startLongPress, { passive: true });
+    el.addEventListener("mousemove", moveLongPress);
+    el.addEventListener("touchmove", moveLongPress, { passive: true });
     el.addEventListener("mouseup", cancelLongPress);
     el.addEventListener("mouseleave", cancelLongPress);
     el.addEventListener("touchend", cancelLongPress);
     el.addEventListener("touchcancel", cancelLongPress);
-
+    
     el.addEventListener("click", (event) => {
       if (event.target.closest("button, select, input, textarea, a")) return;
       if (isUnclickable) {
