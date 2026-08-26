@@ -68,35 +68,25 @@
       <!-- ── GROUP PAGE VIEW ────────────────────────────────────────── -->
       <div id="view-group" class="view hidden">
         <section class="group-page-hero">
-          <div id="group-cover-photo" class="group-cover hidden" style="width:100%; height:150px; background-size:cover; background-position:center; border-radius:12px; margin-bottom:16px;"></div>
-          
-          <div class="group-info-section" style="margin-bottom: 24px;">
-            <span><strong>Created:</strong> <span id="group-created">-</span></span>
-            <span><strong>Cards:</strong> <span id="group-stat-cards">0</span></span>
-            <span><strong>Entries:</strong> <span id="group-stat-entries">0</span></span>
-            <span><strong>Total:</strong> <span id="group-stat-total">0</span></span>
-            <span><strong>Week:</strong> <span id="group-stat-week">0</span></span>
-            <span><strong>Month:</strong> <span id="group-stat-month">0</span></span>
+          <div id="group-cover-photo" class="group-cover hidden" style="width:100%; height:150px; background-size:cover; background-position:center; border-radius:12px; margin-bottom:12px;"></div>
+
+          <div class="group-title-row">
+            <h1 id="group-title" class="group-page-title">Group</h1>
+            <div class="group-title-actions">
+              <button id="edit-group-btn" class="icon-btn" type="button" title="Edit Group">✏️</button>
+              <button id="back-to-dashboard-btn" class="icon-btn" type="button" title="Back">✕</button>
+            </div>
           </div>
 
-          <h1 id="group-title" class="group-page-title">Group</h1>
           <p id="group-description" class="group-page-desc"></p>
-          
-          <div class="group-controls">
-            <button id="back-to-dashboard-btn" class="inline-btn btn-secondary" type="button">
-              <i class="fa-solid fa-arrow-left"></i> Back to Groups
-            </button>
-            <button id="edit-group-btn" class="inline-btn btn-secondary" type="button">
-              <i class="fa-solid fa-pen"></i> Edit Group
-            </button>
-            <select id="group-layout-select" class="inline-btn">
-              <option value="3">3 cards/row</option>
-              <option value="4">4 cards/row</option>
-            </select>
-            <select id="group-sort-select" class="inline-btn">
-              <option value="newest">Newest</option>
-              <option value="most">Most clicked</option>
-            </select>
+
+          <div class="group-info-section">
+            <span>Created: <span id="group-created">-</span></span>
+            <span>Cards: <span id="group-stat-cards">0</span></span>
+            <span>Entries: <span id="group-stat-entries">0</span></span>
+            <span>Total: <span id="group-stat-total">0</span></span>
+            <span>Week: <span id="group-stat-week">0</span></span>
+            <span>Month: <span id="group-stat-month">0</span></span>
           </div>
         </section>
 
@@ -104,7 +94,7 @@
           <div id="cards-container" class="cards-grid layout-3"></div>
         </section>
       </div>
-
+      
     </main>
   </div>
 
@@ -173,6 +163,20 @@
       <div class="form-group">
         <label for="edit-group-click-limit-input">Click Limit (optional)</label>
         <input id="edit-group-click-limit-input" type="number" min="1" placeholder="e.g., 1000 - all cards become unclickable when total group clicks reach this limit">
+      </div>
+      <div class="form-group">
+        <label for="group-layout-select">Cards per row</label>
+        <select id="group-layout-select">
+          <option value="3">3 cards/row</option>
+          <option value="4">4 cards/row</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="group-sort-select">Sort cards</label>
+        <select id="group-sort-select">
+          <option value="newest">Newest</option>
+          <option value="most">Most clicked</option>
+        </select>
       </div>
       <button id="save-edit-group-btn" type="button">Save Group</button>
     </div>
