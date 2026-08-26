@@ -695,3 +695,36 @@ label {
   gap: 6px;
   flex-wrap: wrap;
 }
+/* Same size for entry modal + edit entry modal */
+#entry-modal .modal-content,
+#description-modal .modal-content {
+  width: 75vw;
+  max-width: 75vw;
+  height: 75vh;
+  max-height: 75vh;
+}
+
+/* Smooth fast click feedback */
+.card,
+.group-card,
+.additional-btn,
+.inline-btn,
+.icon-btn {
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.card:active,
+.group-card:active,
+.additional-btn:active,
+.inline-btn:active,
+.icon-btn:active {
+  transform: scale(0.97);
+}
+
+/* Edit entry title stays on one line */
+#description-modal .modal-header h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.1rem;
+}
