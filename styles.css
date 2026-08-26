@@ -841,3 +841,37 @@ label {
   box-shadow: none;
   background: transparent;
 }
+.card .card-top,
+.group-card .card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card .card-top .muted,
+.group-card .card-top .muted {
+  display: inline;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+
+.button-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  }
