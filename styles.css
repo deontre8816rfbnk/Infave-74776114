@@ -600,3 +600,7 @@ label {
 .loading-screen.hidden {
   display: none !important;
 }
+/* Make the hidden class actually work */
+.hidden {
+  display: none !important;
+}
