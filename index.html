@@ -127,11 +127,9 @@
 
   <!-- ── MODALS ─────────────────────────────────────────────────────── -->
 
-  <div class="modal hidden" id="entry-modal">
-    <div class="modal-content">
-      <div class="modal-header">
+  <div class="modal-header">
         <h3 id="entry-modal-title">Labeled Entries</h3>
-        <button id="close-entry-modal-btn" class="danger-btn" type="button">Close</button>
+        <button id="close-entry-modal-btn" class="danger-btn close-btn-sm" type="button">Close</button>
       </div>
       <div class="entry-controls">
         <input id="entry-search-input" type="text" placeholder="Search labels">
@@ -141,7 +139,7 @@
           <option value="oldest">Oldest</option>
           <option value="most-clicks">Most Clicks</option>
         </select>
-        <button id="copy-all-entries-btn" type="button">Copy Full List</button>
+        <button id="copy-all-entries-btn" class="inline-btn" type="button">Copy Full List</button>
       </div>
       <div class="entry-input-wrap">
         <input id="entry-new-label-input" type="text" placeholder="Type label then click outside to save">
