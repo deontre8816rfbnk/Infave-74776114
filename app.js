@@ -731,7 +731,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="button-summary-row">${allClicksRow || '<span class="muted">No clicks</span>'}</div>
         <div class="card-action-row">
-          ${isDatabaseCard ? `<button data-open-entries="${card.id}" class="inline-btn" type="button">View Entries</button>` : ""}
         </div>
         <div class="card-action-row" data-extra-buttons="${card.id}"></div>
       </div>
@@ -762,9 +761,6 @@ document.addEventListener("DOMContentLoaded", () => {
     el.addEventListener("mouseleave", cancelLongPress);
     el.addEventListener("touchend", cancelLongPress);
     el.addEventListener("touchcancel", cancelLongPress);
-
-    const openEntriesBtn = el.querySelector("[data-open-entries]");
-    if (openEntriesBtn) openEntriesBtn.addEventListener("click", () => openEntryModal(card.id));
 
     el.addEventListener("click", (event) => {
       if (event.target.closest("button, select, input, textarea, a")) return;
