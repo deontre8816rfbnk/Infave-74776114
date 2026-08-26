@@ -41,10 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const welcomeSignInBtn = document.getElementById("welcome-sign-in-btn");
   const signOutBtn = document.getElementById("sign-out-btn");
   const appEl = document.getElementById("app");
-  const authBar = document.getElementById("auth-bar");
-  const authName = document.getElementById("auth-name");
-  const authPhoto = document.getElementById("auth-photo");
-  const authAvatarFallback = document.getElementById("auth-avatar-fallback");
   const syncHint = document.getElementById("sync-hint");
   const loadingScreen = document.getElementById("loading-screen");
 
@@ -259,10 +255,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function setLoadingUI() {
     welcomeScreen.classList.add("hidden");
     appEl.classList.add("hidden");
-    authBar.classList.add("hidden");
     signInBtn.classList.add("hidden");
-    if (openCreateGroupModalBtn) openCreateGroupModalBtn.classList.add("hidden");
-    if (openCreateCardModalBtn) openCreateCardModalBtn.classList.add("hidden");
+    if (searchBar) searchBar.classList.add("hidden");
     if (loadingScreen) loadingScreen.classList.remove("hidden");
   }
 
@@ -270,25 +264,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loadingScreen) loadingScreen.classList.add("hidden");
     welcomeScreen.classList.remove("hidden");
     appEl.classList.add("hidden");
-    authBar.classList.add("hidden");
-    authName.textContent = "Signed out";
-    authPhoto.classList.add("hidden");
-    authAvatarFallback.classList.remove("hidden");
     signInBtn.classList.remove("hidden");
-    if (openCreateGroupModalBtn) openCreateGroupModalBtn.classList.add("hidden");
-    if (openCreateCardModalBtn) openCreateCardModalBtn.classList.add("hidden");
+    if (searchBar) searchBar.classList.add("hidden");
   }
 
   function setSignedInUI(user) {
     if (loadingScreen) loadingScreen.classList.add("hidden");
     welcomeScreen.classList.add("hidden");
     appEl.classList.remove("hidden");
-    authBar.classList.remove("hidden");
     signInBtn.classList.add("hidden");
-    if (openCreateGroupModalBtn) openCreateGroupModalBtn.classList.remove("hidden");
-    if (openCreateCardModalBtn) openCreateCardModalBtn.classList.remove("hidden");
-    searchBar.classList.remove("hidden");
-
+    if (searchBar) searchBar.classList.remove("hidden");
+  }
     authName.textContent = user.displayName || "Signed in";
 
     if (user.photoURL) {
