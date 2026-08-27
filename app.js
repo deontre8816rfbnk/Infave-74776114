@@ -142,6 +142,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const editButtonImagePreview = document.getElementById("edit-button-image-preview");
   let editButtonImageData = "";
   const editButtonDraftList = document.getElementById("edit-button-draft-list");
+  const defaultEntryButtonsSection = document.getElementById("default-entry-buttons-section");
+  const defaultEntryBtnInput = document.getElementById("default-entry-btn-input");
+  const addDefaultEntryBtn = document.getElementById("add-default-entry-btn");
+  const defaultEntryBtnList = document.getElementById("default-entry-btn-list");
   const saveEditCardBtn = document.getElementById("save-edit-card-btn");
 
   const entryModal = document.getElementById("entry-modal");
@@ -180,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isAppInitialized = false;
   let draftButtons = [];
   let editDraftButtons = [];
+  let editDefaultEntryButtons = [];
   let activeCardIdForEdit = null;
   let activeCardIdForEntries = null;
   let activeEntryIdForDescription = null;
@@ -472,6 +477,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     closeEditCardModalBtn.addEventListener("click", closeEditCardModal);
     saveEditCardBtn.addEventListener("click", saveEditedCard);
+    addDefaultEntryBtn.addEventListener("click", addDefaultEntryButton);
+
+    defaultEntryBtnInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+    e.preventDefault();
+    addDefaultEntryButton();
+      }
+    });
+    
     editCardModal.addEventListener("click", (e) => { if (e.target === editCardModal) closeEditCardModal(); });
 
     closeEditGroupModalBtn.addEventListener("click", closeEditGroupModal);
@@ -870,6 +884,13 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEditGroupOptions(card.groupId);
     editCardTitleInput.value = card.title || ""; editCardTypeInput.value = card.cardType || "standard"; editCardTypeInput.disabled = true; editCardDescriptionInput.value = card.description || ""; editCardClickLimitInput.value = card.clickLimit || "";
     const isDatabaseCard = card.cardType === "database";
+    defaultEntryButtonsSection.classList.toggle("hidden", !isDatabaseCard);
+    editDefaultEntryButtons = (card.defaultEntryButtons || []).map((button) => ({
+    id: button.id || uid("default-entry-btn"),
+    name: button.name || ""
+}));
+
+renderDefaultEntryButtons();
     const editCardLimitLabel = document.getElementById("edit-card-limit-label");
     if (editCardLimitLabel) editCardLimitLabel.textContent = isDatabaseCard ? "Entry Limit (optional)" : "Click Limit (optional)";
     if (editCardImagePreview) editCardImagePreview.innerHTML = card.imageUrl ? `<img src="${card.imageUrl}" style="width:100%; height:100%; object-fit:cover;">` : "";
@@ -898,6 +919,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const groupId = editCardGroupSelect.value; const title = editCardTitleInput.value.trim(); if (!title) { alert("Card title is required."); return; }
     const clickLimitValue = editCardClickLimitInput.value.trim();
     card.groupId = groupId || null; card.title = title; card.cardType = editCardTypeInput.value; card.description = editCardDescriptionInput.value.trim(); card.imageUrl = editCardImageData || card.imageUrl; card.clickLimit = clickLimitValue ? parseInt(clickLimitValue, 10) : null; card.buttons = editDraftButtons.map((button) => ({ ...button })); card.updatedAt = nowIso();
+    editDefaultEntryButtons = [];
+    card.defaultEntryButtons = editDefaultEntryButtons.map((button) => ({ ...button }));
     await saveStateToFirestore(); renderCurrentView(); closeEditCardModal();
   }
 
@@ -941,7 +964,68 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     editButtonDraftList.querySelectorAll("[data-remove-edit-draft-id]").forEach((el) => el.addEventListener("click", () => removeEditDraftButton(el.getAttribute("data-remove-edit-draft-id"))));
   }
+  
+  function addDefaultEntryButton() {
+  const name = defaultEntryBtnInput.value.trim();
 
+  if (!name) {
+    alert("Button name is required.");
+    return;
+  }
+
+  if (editDefaultEntryButtons.some((b) => b.name.toLowerCase() === name.toLowerCase())) {
+    alert("A default button with this name already exists.");
+    return;
+  }
+
+  editDefaultEntryButtons.push({
+    id: uid("default-entry-btn"),
+    name
+  });
+
+  defaultEntryBtnInput.value = "";
+  renderDefaultEntryButtons();
+}
+
+function removeDefaultEntryButton(buttonId) {
+  editDefaultEntryButtons = editDefaultEntryButtons.filter(
+    (button) => button.id !== buttonId
+  );
+
+  renderDefaultEntryButtons();
+}
+
+function renderDefaultEntryButtons() {
+  defaultEntryBtnList.innerHTML = "";
+
+  editDefaultEntryButtons.forEach((button) => {
+    const li = document.createElement("li");
+    li.className = "chip-row";
+
+    li.innerHTML = `
+      <span class="chip">${escapeHtml(button.name)}</span>
+      <button
+        class="inline-btn danger-btn"
+        data-remove-default-entry-id="${button.id}"
+        type="button"
+      >
+        Remove
+      </button>
+    `;
+
+    defaultEntryBtnList.appendChild(li);
+  });
+
+  defaultEntryBtnList
+    .querySelectorAll("[data-remove-default-entry-id]")
+    .forEach((el) => {
+      el.addEventListener("click", () =>
+        removeDefaultEntryButton(
+          el.getAttribute("data-remove-default-entry-id")
+        )
+      );
+    });
+}
   // ── Click Tracking ───────────────────────────────────────────────────────
   async function registerClick(cardId, sourceType, sourceName) {
     const card = state.cards.find((c) => c.id === cardId); if (!card) return;
