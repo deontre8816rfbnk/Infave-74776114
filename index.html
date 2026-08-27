@@ -73,8 +73,12 @@
           <div class="group-title-row">
             <h1 id="group-title" class="group-page-title">Group</h1>
             <div class="group-title-actions">
-              <button id="edit-group-btn" class="icon-btn" type="button" title="Edit Group">✏️</button>
-              <button id="back-to-dashboard-btn" class="icon-btn" type="button" title="Back">✕</button>
+              <button id="edit-group-btn" class="icon-btn" type="button" title="Edit Group">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button id="back-to-dashboard-btn" class="icon-btn" type="button" title="Back">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
             </div>
           </div>
 
@@ -144,8 +148,8 @@
   <div class="modal hidden" id="edit-group-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Edit Group</h3>
-        <button id="close-edit-group-modal-btn" class="danger-btn" type="button">Close</button>
+        <h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Edit Group</h3>
+        <button id="close-edit-group-modal-btn" class="danger-btn close-btn-sm" type="button">Close</button>
       </div>
       <div class="form-group">
         <label for="edit-group-title-input">Group Title</label>
@@ -178,6 +182,7 @@
           <option value="most">Most clicked</option>
         </select>
       </div>
+      <button id="delete-group-from-edit-btn" class="danger-btn" type="button" style="margin-top:8px;">Delete Group</button>
       <button id="save-edit-group-btn" type="button">Save Group</button>
     </div>
   </div>
@@ -311,6 +316,7 @@
         <ul id="edit-button-draft-list" class="button-draft-list"></ul>
       </div>
       <div style="display:flex; gap:12px; margin-top:16px;">
+        <button id="delete-card-from-edit-btn" class="danger-btn" type="button" style="margin-top:8px;">Delete Card</button>
         <button id="save-edit-card-btn" type="button">Save Card</button>
         <button id="open-add-edit-button-modal-btn" class="inline-btn btn-secondary" type="button">Add a Button</button>
       </div>
