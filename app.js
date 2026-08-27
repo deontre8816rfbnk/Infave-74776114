@@ -966,16 +966,45 @@ document.addEventListener("DOMContentLoaded", () => {
   function openEntryModal(cardId) { activeCardIdForEntries = cardId; const card = state.cards.find((c) => c.id === cardId); if (!card) return; entryModalTitle.textContent = card.title; entrySearchInput.value = ""; entryNewLabelInput.value = ""; entryModal.classList.remove("hidden"); renderEntryList(); }
   function closeEntryModal() { autoSaveEntryOnBlur(); entryModal.classList.add("hidden"); activeCardIdForEntries = null; entryList.innerHTML = ""; }
   async function autoSaveEntryOnBlur() {
-    if (!activeCardIdForEntries) return; const label = entryNewLabelInput.value.trim(); if (!label) return;
-    const card = state.cards.find((c) => c.id === activeCardIdForEntries); if (!card) return;
-    if (card.clickLimit && (card.entries || []).length >= card.clickLimit) { alert("This card has reached its entry limit."); return; }
-    const nextNumber = card.entries.length > 0 ? Math.max(...card.entries.map(e => e.number || 0)) + 1 : 1;
-    card.entries.unshift({ id: uid("entry"), number: nextNumber, label, createdAt: nowIso(), description: "", buttons: [] });
-    card.updatedAt = nowIso(); entryNewLabelInput.value = "";
-    await saveStateToFirestore(); renderEntryList(); renderCurrentView();
+    if (!activeCardIdForEntries) return;
+    const label = entryNewLabelInput.value.trim();
+    if (!label) return;
+    const card = state.cards.find((c) => c.id === activeCardIdForEntries);
+    if (!card) return;
+    if (card.clickLimit && (card.entries || []).length >= card.clickLimit) {
+      alert("This card has reached its entry limit.");
+      return;
+    }
+    const nextNumber = card.entries.length > 0
+      ? Math.max(...card.entries.map((e) => e.number || 0)) + 1
+      : 1;
+    const defaultBtns = (card.defaultEntryButtons || []).map((b) => ({
+      id: uid("entry-btn"),
+      name: b.name,
+      clickCount: 0
+    }));
+    card.entries.unshift({
+      id: uid("entry"),
+      number: nextNumber,
+      label,
+      createdAt: nowIso(),
+      description: "",
+      buttons: defaultBtns
+    });
+    card.updatedAt = nowIso();
+    entryNewLabelInput.value = "";
+    await saveStateToFirestore();
+    renderEntryList();
+    renderCurrentView();
   }
   function getSortedEntries(card) { const hasSortOrder = card.entries.some(e => e.sortOrder !== undefined); return hasSortOrder ? [...card.entries].sort((a, b) => (a.sortOrder ?? Infinity) - (b.sortOrder ?? Infinity) || new Date(a.createdAt) - new Date(b.createdAt)) : [...card.entries].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); }
-  function buildEntryNumberMap(card) { const sorted = getSortedEntries(card); const map = new Map(); sorted.forEach((e, idx) => map.set(e.id, idx + 1)); return map; }
+  function buildEntryNumberMap(card) {
+    const map = new Map();
+    (card.entries || []).forEach((e) => {
+      map.set(e.id, e.number || 0);
+    });
+    return map;
+  }
   function renderEntryList() {
     if (!activeCardIdForEntries) return;
     const card = state.cards.find((c) => c.id === activeCardIdForEntries);
@@ -986,31 +1015,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const sort = entrySortSelect.value;
     if (sort === "newest") entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     else if (sort === "oldest") entries.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    else if (sort === "most-clicks") entries.sort((a, b) => ((b.buttons || []).reduce((s, x) => s + (x.clickCount || 0), 0)) - ((a.buttons || []).reduce((s, x) => s + (x.clickCount || 0), 0)));
-    else entries = getSortedEntries({ ...card, entries });
-    const numberMap = buildEntryNumberMap(card);
+    else if (sort === "most-clicks") {
+      entries.sort((a, b) =>
+        ((b.buttons || []).reduce((s, x) => s + (x.clickCount || 0), 0)) -
+        ((a.buttons || []).reduce((s, x) => s + (x.clickCount || 0), 0))
+      );
+    } else {
+      entries = getSortedEntries({ ...card, entries });
+    }
     entryList.innerHTML = "";
-    if (entries.length === 0) { entryList.innerHTML = `<p class="muted">No entries found.</p>`; return; }
+    if (entries.length === 0) {
+      entryList.innerHTML = `<p class="muted">No entries found.</p>`;
+      return;
+    }
 
     entries.forEach((entry) => {
-      const displayNum = numberMap.get(entry.id);
-      const row = document.createElement("div");
-      row.className = "entry-row";
-      row.dataset.entryId = entry.id;
-      row.innerHTML = `<div class="entry-row-header"><strong>${displayNum}. ${escapeHtml(entry.label)}</strong><span class="muted"> ${new Date(entry.createdAt).toLocaleString()}</span></div>`;
+      const displayNum = entry.number || 0;
+      const entryButtonsHtml = (entry.buttons || []).map((b, idx) =>
+        `<button class="entry-swipe-btn" data-entry-btn="\( {entry.id}" data-btn-idx=" \){idx}" type="button">${escapeHtml(b.name)} ${b.clickCount || 0}</button>`
+      ).join("") || `<span class="muted" style="font-size:0.7rem;padding:6px;">No buttons</span>`;
 
+      const wrap = document.createElement("div");
+      wrap.className = "entry-row-wrap";
+      wrap.innerHTML =
+        `<div class="entry-row-actions-behind">${entryButtonsHtml}</div>` +
+        `<div class="entry-row" data-entry-id="${entry.id}">` +
+          `<div class="entry-row-header">` +
+            `<strong>${displayNum}. ${escapeHtml(entry.label)}</strong>` +
+            `<span class="muted">${new Date(entry.createdAt).toLocaleString()}</span>` +
+          `</div>` +
+        `</div>`;
+
+      const front = wrap.querySelector(".entry-row");
       let longPressTimer = null;
       let longPressed = false;
       let startX = 0;
       let currentX = 0;
       let swiping = false;
+      let revealed = false;
 
-      row.addEventListener("click", () => {
+      front.addEventListener("click", () => {
         if (longPressed || swiping) return;
+        if (revealed) {
+          front.style.transform = "";
+          revealed = false;
+          return;
+        }
         openDescriptionModal(entry.id);
       });
 
-      row.addEventListener("touchstart", (e) => {
+      front.addEventListener("touchstart", (e) => {
         longPressed = false;
         swiping = false;
         startX = e.touches[0].clientX;
@@ -1018,12 +1072,12 @@ document.addEventListener("DOMContentLoaded", () => {
         longPressTimer = setTimeout(() => {
           longPressed = true;
           copySingleEntry(entry.id);
-          row.classList.add("entry-copied");
-          setTimeout(() => row.classList.remove("entry-copied"), 400);
+          front.classList.add("entry-copied");
+          setTimeout(() => front.classList.remove("entry-copied"), 400);
         }, 450);
       }, { passive: true });
 
-      row.addEventListener("touchmove", (e) => {
+      front.addEventListener("touchmove", (e) => {
         currentX = e.touches[0].clientX;
         const dx = currentX - startX;
         if (Math.abs(dx) > 10) {
@@ -1031,34 +1085,48 @@ document.addEventListener("DOMContentLoaded", () => {
           swiping = true;
         }
         if (dx < 0) {
-          row.style.transform = `translateX(${dx}px)`;
-          row.style.opacity = String(Math.max(0.3, 1 + dx / 200));
+          front.style.transform = "translateX(" + Math.max(dx, -120) + "px)";
+        } else if (dx > 0) {
+          front.style.transform = "translateX(" + Math.min(dx, 120) + "px)";
         }
       }, { passive: true });
 
-      row.addEventListener("touchend", () => {
+      front.addEventListener("touchend", () => {
         clearTimeout(longPressTimer);
         const dx = currentX - startX;
         if (dx < -80) {
-          row.style.transition = "transform 0.2s ease, opacity 0.2s ease";
-          row.style.transform = "translateX(-120%)";
-          row.style.opacity = "0";
+          front.style.transition = "transform 0.2s ease, opacity 0.2s ease";
+          front.style.transform = "translateX(-120%)";
+          front.style.opacity = "0";
           setTimeout(() => deleteEntry(entry.id), 180);
+        } else if (dx > 60) {
+          front.style.transition = "transform 0.2s ease";
+          front.style.transform = "translateX(120px)";
+          revealed = true;
         } else {
-          row.style.transition = "transform 0.2s ease, opacity 0.2s ease";
-          row.style.transform = "";
-          row.style.opacity = "";
+          front.style.transition = "transform 0.2s ease";
+          front.style.transform = "";
+          revealed = false;
         }
         setTimeout(() => { swiping = false; }, 50);
       });
 
-      row.addEventListener("touchcancel", () => {
+      front.addEventListener("touchcancel", () => {
         clearTimeout(longPressTimer);
-        row.style.transform = "";
-        row.style.opacity = "";
+        front.style.transform = "";
+        revealed = false;
       });
 
-      entryList.appendChild(row);
+      wrap.querySelectorAll("[data-entry-btn]").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const entryId = el.getAttribute("data-entry-btn");
+          const btnIdx = parseInt(el.getAttribute("data-btn-idx"), 10);
+          registerEntryButtonClick(entryId, btnIdx);
+        });
+      });
+
+      entryList.appendChild(wrap);
     });
   }
   async function deleteEntry(entryId) { if (!activeCardIdForEntries) return; const card = state.cards.find((c) => c.id === activeCardIdForEntries); if (!card) return; card.entries = card.entries.filter((e) => e.id !== entryId); await saveStateToFirestore(); renderEntryList(); renderCurrentView(); }
