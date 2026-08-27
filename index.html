@@ -182,8 +182,10 @@
           <option value="most">Most clicked</option>
         </select>
       </div>
-      <button id="delete-group-from-edit-btn" class="danger-btn" type="button" style="margin-top:8px;">Delete Group</button>
-      <button id="save-edit-group-btn" type="button">Save Group</button>
+      <div class="edit-group-actions">
+          <button id="delete-group-from-edit-btn" class="danger-btn" type="button" style="margin-top:8px;">Delete Group</button>
+          <button id="save-edit-group-btn" type="button">Save Group</button>
+      </div>
     </div>
   </div>
 
@@ -267,8 +269,8 @@
   <div class="modal hidden" id="edit-card-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Edit Card</h3>
-        <button id="close-edit-card-modal-btn" class="danger-btn" type="button">Close</button>
+        <h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Edit Card</h3>
+        <button id="close-edit-card-modal-btn" class="danger-btn close-btn-sm" type="button">Close</button>
       </div>
       <div class="card-info-section">
         <h4>Card Info</h4>
@@ -281,24 +283,19 @@
         </div>
         <div id="edit-card-button-stats" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"></div>
       </div>
-      <div style="display:flex; gap:12px; align-items:flex-start;">
-        <div class="form-group" style="flex:1;">
-          <label for="edit-card-image-input">Card Image</label>
-          <input id="edit-card-image-input" type="file" accept="image/*">
-          <div id="edit-card-image-preview" style="margin-top:8px; max-width:200px; max-height:150px; overflow:hidden; border-radius:12px;"></div>
-        </div>
-        <div class="form-group" style="flex:1;">
-          <label for="edit-card-group-select">Group (optional)</label>
-          <select id="edit-card-group-select"></select>
-        </div>
-        <div class="form-group" style="flex:1;">
-          <label for="edit-card-type-input">Card Type</label>
-          <select id="edit-card-type-input" disabled>
-            <option value="standard">Standard card (count clicks only)</option>
-            <option value="database">Database Type</option>
-          </select>
-        </div>
+      <div class="edit-card-quick-row">
+        <label class="quick-btn">
+          Image
+          <input id="edit-card-image-input" type="file" accept="image/*" hidden>
+        </label>
+        <select id="edit-card-group-select" class="quick-btn-select"></select>
+        <select id="edit-card-type-input" class="quick-btn-select" disabled>
+          <option value="standard">Standard</option>
+          <option value="database">Database</option>
+        </select>
       </div>
+      <div id="edit-card-image-preview" class="edit-card-image-preview"></div>
+      
       <div class="form-group">
         <label for="edit-card-title-input">Card Title</label>
         <input id="edit-card-title-input" type="text" placeholder="Card title">
@@ -316,13 +313,14 @@
         <ul id="edit-button-draft-list" class="button-draft-list"></ul>
       </div>
       <div style="display:flex; gap:12px; margin-top:16px;">
-        <button id="delete-card-from-edit-btn" class="danger-btn" type="button" style="margin-top:8px;">Delete Card</button>
-        <button id="save-edit-card-btn" type="button">Save Card</button>
-        <button id="open-add-edit-button-modal-btn" class="inline-btn btn-secondary" type="button">Add a Button</button>
+        <div class="edit-card-actions">
+        <button id="delete-card-from-edit-btn" class="danger-btn edit-action-btn" type="button">Delete</button>
+        <button id="save-edit-card-btn" class="edit-action-btn" type="button">Save</button>
+        <button id="open-add-edit-button-modal-btn" class="inline-btn btn-secondary edit-action-btn" type="button">Add Button</button>
+        </div>
       </div>
     </div>
   </div>
-
   <div class="modal hidden" id="add-edit-button-modal" style="background:rgba(0,0,0,0.4);">
     <div class="modal-content" style="max-width:350px;">
       <div class="modal-header" style="justify-content:center; border-bottom: none; margin-bottom: 16px;">
