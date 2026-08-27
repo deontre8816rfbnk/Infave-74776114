@@ -308,6 +308,16 @@
         <label for="edit-card-click-limit-input" id="edit-card-limit-label">Click Limit (optional)</label>
         <input id="edit-card-click-limit-input" type="number" min="1" placeholder="e.g., 100 - card becomes unclickable at limit">
       </div>
+      <div id="default-entry-buttons-section" class="form-group hidden">
+        <label>Default buttons for new entries</label>
+        <div class="default-entry-btn-row">
+          <input id="default-entry-btn-input" type="text" placeholder="Button name">
+          <button id="add-default-entry-btn" class="icon-btn primary-icon-btn" type="button" title="Add">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <ul id="default-entry-btn-list" class="button-draft-list"></ul>
+      </div>
       <div class="button-builder">
         <h3>Additional Buttons</h3>
         <ul id="edit-button-draft-list" class="button-draft-list"></ul>
