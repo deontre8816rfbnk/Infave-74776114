@@ -723,15 +723,15 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const typeChip = `<span class="chip">${isDatabaseCard ? "Database" : "Standard"}</span>`;
     const mainCount = isDatabaseCard ? `Entries ${entryCount}` : `Clicks ${card.clicks}`;
-    const limitIndicator = card.clickLimit ? `<span class="chip \( {isAtLimit ? "limit-reached" : ""}"> \){isDatabaseCard ? entryCount : card.clicks}/${card.clickLimit}</span>` : "";
-    const allClicksRow = `\( {typeChip}<span class="chip"> \){mainCount}</span>${limitIndicator}`;
+    const limitIndicator = card.clickLimit ? `<span class="chip ${isAtLimit ? "limit-reached" : ""}"> ${isDatabaseCard ? entryCount : card.clicks}/${card.clickLimit}</span>` : "";
+    const allClicksRow = `${typeChip}<span class="chip"> ${mainCount}</span>${limitIndicator}`;
 
     el.innerHTML = `
       ${imageContent}
       <div class="card-content">
         <div class="card-top">
           <strong>${escapeHtml(card.title)}</strong>
-          <p class="muted">\( {escapeHtml(card.description || "No description")} \){isUnclickable ? ' <span style="color:#dc2626;font-weight:bold;">(LIMIT REACHED)</span>' : ""}</p>
+          <p class="muted"> ${escapeHtml(card.description || "No description")} ${isUnclickable ? ' <span style="color:#dc2626;font-weight:bold;">(LIMIT REACHED)</span>' : ""}</p>
         </div>
         <div class="button-summary-row">${allClicksRow}</div>
       </div>
