@@ -875,3 +875,73 @@ label {
   color: var(--muted-foreground);
   white-space: nowrap;
   }
+.group-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 2px;
+}
+
+.group-title-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.group-title-actions .icon-btn {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+}
+
+.group-page-hero {
+  overflow: visible;
+  width: 100%;
+  box-sizing: border-box;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-buttons-outside {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 12px 12px 12px;
+}
+
+.additional-btn {
+  width: auto;
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 8px;
+  background: var(--muted);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.button-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
