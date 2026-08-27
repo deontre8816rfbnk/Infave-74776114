@@ -408,9 +408,20 @@ document.addEventListener("DOMContentLoaded", () => {
     createCardBtn.addEventListener("click", createCard);
     openCreateCardModalBtn.addEventListener("click", () => {
       updateCreateCardLimitLabel();
+      renderGroupOptions();
       if (currentView === "group" && currentGroupId) {
-        const group = getGroup(currentGroupId);
-        createCardAssignedGroupLabel.textContent = group ? `This card will be added to: ${group.title}` : "This card will be added to the current group.";
+        if (cardGroupSelect) cardGroupSelect.value = currentGroupId;
+        if (createCardAssignedGroupLabel) {
+          const group = getGroup(currentGroupId);
+          createCardAssignedGroupLabel.textContent = group ? `This card will be added to: ${group.title}` : "";
+          createCardAssignedGroupLabel.classList.remove("hidden");
+        }
+      } else {
+        if (cardGroupSelect) cardGroupSelect.value = "";
+        if (createCardAssignedGroupLabel) {
+          createCardAssignedGroupLabel.textContent = "";
+          createCardAssignedGroupLabel.classList.add("hidden");
+        }
       }
       createCardModal.classList.remove("hidden");
     });
@@ -499,7 +510,28 @@ document.addEventListener("DOMContentLoaded", () => {
     // Search Listeners
     searchInput.addEventListener("input", (e) => performSearch(e.target.value));
     clearSearchBtn.addEventListener("click", () => { searchInput.value = ""; performSearch(""); });
+    const deleteCardFromEditBtn = document.getElementById("delete-card-from-edit-btn");
+    if (deleteCardFromEditBtn) {
+      deleteCardFromEditBtn.addEventListener("click", async () => {
+        if (!activeCardIdForEdit) return;
+        if (!confirm("Delete this card?")) return;
+        const id = activeCardIdForEdit;
+        editCardModal.classList.add("hidden");
+        await deleteCard(id);
+      });
+    }
 
+    const deleteGroupFromEditBtn = document.getElementById("delete-group-from-edit-btn");
+    if (deleteGroupFromEditBtn) {
+      deleteGroupFromEditBtn.addEventListener("click", async () => {
+        const id = currentGroupId || activeGroupIdForContext;
+        if (!id) return;
+        if (!confirm("Delete this group?")) return;
+        editGroupModal.classList.add("hidden");
+        await deleteGroup(id);
+        showDashboardView();
+      });
+    }
     // SPA Group View Listeners
     backToDashboardBtn.addEventListener("click", showDashboardView);
     editGroupBtn.addEventListener("click", () => { if (currentGroupId) openEditGroupModal(currentGroupId); });
@@ -613,8 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
           longPressOpened = false;
           longPressTimer = setTimeout(() => {
             longPressOpened = true;
-            activeGroupIdForContext = group.id;
-            groupContextMenu.classList.remove("hidden");
+            openEditGroupModal(group.id);
           }, 500);
         };
         const cancelLongPress = () => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } };
@@ -690,34 +721,33 @@ document.addEventListener("DOMContentLoaded", () => {
       : `<div class="card-image">${escapeHtml(card.title.charAt(0).toUpperCase())}</div>`;
     const buttonChips = card.buttons.map((b) => `<span class="chip">${escapeHtml(b.name)} ${b.clickCount}</span>`).join("");
     
-    const mainCount = isDatabaseCard ? `Entries ${entryCount}` : `Card ${card.clicks}`;
-    const limitIndicator = card.clickLimit ? `<span class="chip ${isAtLimit ? 'limit-reached' : ''}">${isDatabaseCard ? entryCount : card.clicks}/${card.clickLimit}</span>` : '';
-    const allClicksRow = `<span class="chip">${mainCount}</span>${limitIndicator}${buttonChips}`;
-    
+    const typeChip = `<span class="chip">${isDatabaseCard ? "Database" : "Standard"}</span>`;
+    const mainCount = isDatabaseCard ? `Entries ${entryCount}` : `Clicks ${card.clicks}`;
+    const limitIndicator = card.clickLimit ? `<span class="chip \( {isAtLimit ? "limit-reached" : ""}"> \){isDatabaseCard ? entryCount : card.clicks}/${card.clickLimit}</span>` : "";
+    const allClicksRow = `\( {typeChip}<span class="chip"> \){mainCount}</span>${limitIndicator}`;
+
     el.innerHTML = `
       ${imageContent}
       <div class="card-content">
         <div class="card-top">
-          <div>
-            <strong>${escapeHtml(card.title)}</strong>
-            <p class="muted">Type: ${isDatabaseCard ? "Database" : "Standard"}${isUnclickable ? ' <span style="color:#dc2626;font-weight:bold;">(LIMIT REACHED)</span>' : ''}</p>
-            <p class="muted">${escapeHtml(card.description || "No description")}</p>
-          </div>
+          <strong>${escapeHtml(card.title)}</strong>
+          <p class="muted">\( {escapeHtml(card.description || "No description")} \){isUnclickable ? ' <span style="color:#dc2626;font-weight:bold;">(LIMIT REACHED)</span>' : ""}</p>
         </div>
-        <div class="button-summary-row">${allClicksRow || '<span class="muted">No clicks</span>'}</div>
-        <div class="card-action-row">
-        </div>
-        <div class="card-action-row" data-extra-buttons="${card.id}"></div>
+        <div class="button-summary-row">${allClicksRow}</div>
       </div>
+      <div class="card-buttons-outside" data-extra-buttons="${card.id}"></div>
     `;
 
     const row = el.querySelector(`[data-extra-buttons="${card.id}"]`);
     card.buttons.forEach((button) => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "additional-btn inline-btn";
-      btn.textContent = button.name;
-      btn.addEventListener("click", () => handleAdditionalButtonClick(card.id, button.id));
+      btn.className = "additional-btn";
+      btn.textContent = `${button.name} ${button.clickCount || 0}`;
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        handleAdditionalButtonClick(card.id, button.id);
+      });
       row.appendChild(btn);
     });
 
@@ -728,9 +758,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pressStartX = point.clientX;
       pressStartY = point.clientY;
       longPressTimer = setTimeout(() => {
-        activeCardIdForContext = card.id;
-        cardContextMenu.classList.remove("hidden");
-      }, 550);
+        openEditCardModal(card.id);      }, 550);
     };
     const cancelLongPress = () => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } };
     const moveLongPress = (e) => {
@@ -825,7 +853,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function createCard() {
-    const groupId = currentView === "group" ? currentGroupId : cardGroupSelect.value;
+    const groupId = currentView === "group" ? currentGroupId : (cardGroupSelect ? cardGroupSelect.value : null);
     const title = cardTitleInput.value.trim(); if (!title) { alert("Card title is required."); return; }
     const clickLimitValue = cardClickLimitInput.value.trim();
     state.cards.unshift({ id: uid("card"), groupId: groupId || null, title, cardType: cardTypeInput.value, description: cardDescriptionInput.value.trim(), imageUrl: cardImageData, clickLimit: clickLimitValue ? parseInt(clickLimitValue, 10) : null, createdAt: nowIso(), updatedAt: nowIso(), clicks: 0, clickHistory: [], buttons: draftButtons, entries: [] });
